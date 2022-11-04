@@ -127,4 +127,20 @@ BEGIN
     
 	DELETE FROM inventory WHERE inventory.inventory_id = find_item_by_id; 
 END;;
+
+CREATE PROCEDURE unequip(equipped_id INT UNSIGNED)
+BEGIN
+	DECLARE find_item_by_id INT UNSIGNED;
+    SELECT equipped_id INTO find_item_by_id;
+    
+	INSERT INTO inventory
+	SELECT 
+		equipped.equipped_id,
+		equipped.character_id,
+		equipped.item_id
+	FROM equipped
+	WHERE equipped.equipped_id = find_item_by_id;
+    
+	DELETE FROM equipped WHERE equipped.equipped_id = find_item_by_id; 
+END;;
 DELIMITER ;
