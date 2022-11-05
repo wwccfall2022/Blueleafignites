@@ -162,4 +162,24 @@ BEGIN
 			ON team_members.character_id = characters.character_id
 	WHERE teams.team_id = find_winners_by_team_id;
 END;;
+
+CREATE FUNCTION armor_total(character_id INT UNSIGNED)
+RETURNS TINYINT
+DETERMINISTIC 
+BEGIN
+	DECLARE find_armor_total_by_character_id INT UNSIGNED;
+	DECLARE sum_of_character_armor TINYINT;
+
+	SELECT character_id INTO find_armor_total_by_character_id;
+
+	SELECT 
+		SUM(items.armor)
+	FROM equipped
+		INNER JOIN items
+			ON equipped.item_id = items.item_id
+	WHERE equipped.character_id = find_armor_total_by_character_id
+	INTO sum_of_character_armor;
+	
+    Return sum_of_character_armor;
+END;;
 DELIMITER ;
