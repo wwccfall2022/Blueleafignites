@@ -149,6 +149,8 @@ BEGIN
 	DECLARE find_winners_by_team_id INT UNSIGNED;
     	SELECT team_id INTO find_winners_by_team_id;
     
+    	DELETE FROM winners;
+    
 	INSERT INTO winners
 	SELECT 
 		characters.character_id,
