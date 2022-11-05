@@ -115,8 +115,8 @@ DELIMITER ;;
 CREATE PROCEDURE equip(inventory_id INT UNSIGNED)
 BEGIN
 	DECLARE find_item_by_id INT UNSIGNED;
-    SELECT inventory_id INTO find_item_by_id;
-    
+	SELECT inventory_id INTO find_item_by_id;
+
 	INSERT INTO equipped
 	SELECT 
 		inventory.inventory_id,
@@ -131,7 +131,7 @@ END;;
 CREATE PROCEDURE unequip(equipped_id INT UNSIGNED)
 BEGIN
 	DECLARE find_item_by_id INT UNSIGNED;
-    SELECT equipped_id INTO find_item_by_id;
+    	SELECT equipped_id INTO find_item_by_id;
     
 	INSERT INTO inventory
 	SELECT 
@@ -142,5 +142,22 @@ BEGIN
 	WHERE equipped.equipped_id = find_item_by_id;
     
 	DELETE FROM equipped WHERE equipped.equipped_id = find_item_by_id; 
+END;;
+
+CREATE PROCEDURE set_winners(team_id INT UNSIGNED)
+BEGIN
+	DECLARE find_winners_by_team_id INT UNSIGNED;
+    	SELECT team_id INTO find_winners_by_team_id;
+    
+	INSERT INTO winners
+	SELECT 
+		characters.character_id,
+		characters.name
+	FROM teams
+		INNER JOIN team_members
+			ON teams.team_id = team_members.team_id
+		INNER JOIN characters
+			ON team_members.character_id = characters.character_id
+	WHERE teams.team_id = find_winners_by_team_id;
 END;;
 DELIMITER ;
