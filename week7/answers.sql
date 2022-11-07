@@ -168,18 +168,27 @@ RETURNS TINYINT
 DETERMINISTIC 
 BEGIN
 	DECLARE find_armor_total_by_character_id INT UNSIGNED;
-	DECLARE sum_of_character_armor TINYINT;
-
+	DECLARE sum_of_character_armor_from_items TINYINT;
+    DECLARE sum_of_character_natural_armor TINYINT;
+    DECLARE total_sum_of_armor TINYINT;
+    
 	SELECT character_id INTO find_armor_total_by_character_id;
-
+    
 	SELECT 
 		SUM(items.armor)
 	FROM equipped
 		INNER JOIN items
 			ON equipped.item_id = items.item_id
 	WHERE equipped.character_id = find_armor_total_by_character_id
-	INTO sum_of_character_armor;
-	
-    Return sum_of_character_armor;
+    INTO sum_of_character_armor_from_items;
+    
+	SELECT character_stats.armor 
+    FROM character_stats 
+    WHERE character_stats.character_id = find_armor_total_by_character_id
+    INTO sum_of_character_natural_armor;
+
+	SELECT sum_of_character_armor_from_items + sum_of_character_natural_armor INTO total_sum_of_armor;
+
+    Return total_sum_of_armor;
 END;;
 DELIMITER ;
