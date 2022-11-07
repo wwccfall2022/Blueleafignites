@@ -224,40 +224,4 @@ BEGIN
 		END IF;
 	END IF;
 END;;
-
-CREATE PROCEDURE character_items(character_id INT UNSIGNED)
-BEGIN
-	DECLARE find_inventory_by_id INT UNSIGNED;
-	
-	SELECT character_id INTO find_inventory_by_id;
-    
-	CREATE OR REPLACE VIEW character_inventory AS
-	SELECT 
-		characters.name AS username,
-		items.name AS item,
-		items.armor,
-		items.damage
-	FROM characters
-		INNER JOIN inventory
-			ON characters.character_id = inventory.character_id
-		INNER JOIN items
-			ON inventory.item_id = items.item_id
-		WHERE inventory.character_id = find_inventory_by_id;
-
-	CREATE OR REPLACE VIEW character_equipped_items AS
-	SELECT 
-		characters.name AS username,
-		items.name AS item,
-		items.armor,
-		items.damage
-	FROM characters
-		INNER JOIN equipped
-			ON characters.character_id = equipped.character_id
-		INNER JOIN items
-			ON equipped.item_id = items.item_id
-	WHERE equipped.character_id = find_inventory_by_id;
-
-	SELECT * FROM character_inventory;
-	SELECT * FROM character_equipped_items;
-END;;
 DELIMITER ;
