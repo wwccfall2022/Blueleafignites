@@ -192,36 +192,28 @@ BEGIN
 Return total_sum_of_armor;
 END;;
 
-CREATE PROCEDURE attack(id_of_character_being_attacked INT UNSIGNED, id_of_equipped_item_used_for_attack INT UNSIGNED)
-BEGIN
-	DECLARE find_total_dmg_by_item_id INT UNSIGNED;	
-	DECLARE character_being_attacked INT UNSIGNED;
-	DECLARE total_dmg TINYINT;
-	DECLARE character_hp TINYINT;
-
-	SELECT id_of_equipped_item_used_for_attack INTO find_total_dmg_by_item_id;
-	SELECT id_of_character_being_attacked INTO character_being_attacked;
-    
-	SELECT 
-		SUM(items.damage)
-	FROM equipped
-		INNER JOIN items
-			ON equipped.item_id = items.item_id
-	WHERE equipped.item_id = find_total_dmg_by_item_id
-    	INTO total_dmg;
-    
-    	SELECT 
-		character_stats.health
-	FROM characters
-		INNER JOIN character_stats
-			ON characters.character_id = character_stats.character_id
-	WHERE characters.character_id = character_being_attacked
-    	INTO character_hp;
-    
-	IF (armor_total(character_being_attacked) - total_dmg) < 0 THEN
-		IF (character_hp - total_dmg) <= 0 THEN
-			DELETE FROM characters WHERE characters.character_id = character_being_attacked;
-		END IF;
-	END IF;
-END;;
 DELIMITER ;
+
+CREATE OR REPLACE VIEW character_items AS
+SELECT 
+	characters.name AS username,
+	items.name AS item,
+	items.armor,
+	items.damage
+FROM characters
+	INNER JOIN inventory
+		ON characters.character_id = inventory.character_id
+	INNER JOIN items
+		ON inventory.item_id = items.item_id
+UNION
+SELECT 
+	characters.name AS username,
+	items.name AS item,
+	items.armor,
+	items.damage
+FROM characters
+	INNER JOIN equipped
+		ON characters.character_id = equipped.character_id
+	INNER JOIN items
+		ON equipped.item_id = items.item_id;
+
