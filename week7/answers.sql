@@ -140,8 +140,7 @@ BEGIN
 		equipped.character_id,
 		equipped.item_id
 	FROM equipped
-	WHERE equipped.equipped_id = find_item_by_id
-	ORDER BY item_name;
+	WHERE equipped.equipped_id = find_item_by_id;
     
 	DELETE FROM equipped WHERE equipped.equipped_id = find_item_by_id; 
 END;;
