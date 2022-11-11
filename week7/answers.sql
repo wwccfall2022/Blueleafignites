@@ -217,3 +217,37 @@ FROM characters
 	INNER JOIN items
 		ON equipped.item_id = items.item_id;
 
+
+
+CREATE OR REPLACE VIEW team_items AS
+SELECT 
+	teams.team_id,
+	teams.name AS name,
+	items.name AS item,
+	items.armor,
+	items.damage
+FROM teams
+	INNER JOIN team_members
+		ON teams.team_id = team_members.team_id
+	INNER JOIN characters
+		ON team_members.character_id = characters.character_id
+	INNER JOIN inventory
+		ON characters.character_id = inventory.character_id
+	INNER JOIN items
+		ON inventory.item_id = items.item_id
+UNION
+SELECT 
+	teams.team_id,
+	teams.name AS team,
+	items.name AS item,
+	items.armor,
+	items.damage
+FROM teams
+	INNER JOIN team_members
+		ON teams.team_id = team_members.team_id
+	INNER JOIN characters
+		ON team_members.character_id = characters.character_id
+	INNER JOIN equipped
+		ON characters.character_id = equipped.character_id
+	INNER JOIN items
+		ON equipped.item_id = items.item_id;
