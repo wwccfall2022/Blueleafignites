@@ -196,7 +196,7 @@ DELIMITER ;
 
 CREATE OR REPLACE VIEW character_items AS
 SELECT 
-	characters.name AS username,
+	characters.name AS character_name,
 	items.name AS item,
 	items.armor,
 	items.damage
@@ -207,7 +207,7 @@ FROM characters
 		ON inventory.item_id = items.item_id
 UNION
 SELECT 
-	characters.name AS username,
+	characters.name AS character_name,
 	items.name AS item,
 	items.armor,
 	items.damage
@@ -222,7 +222,7 @@ FROM characters
 CREATE OR REPLACE VIEW team_items AS
 SELECT 
 	teams.team_id,
-	teams.name AS name,
+	teams.name AS team_name,
 	items.name AS item,
 	items.armor,
 	items.damage
@@ -238,7 +238,7 @@ FROM teams
 UNION
 SELECT 
 	teams.team_id,
-	teams.name AS team,
+	teams.name AS team_name,
 	items.name AS item,
 	items.armor,
 	items.damage
