@@ -196,8 +196,9 @@ DELIMITER ;
 
 CREATE OR REPLACE VIEW character_items AS
 SELECT 
+	characters.character_id,
 	characters.name AS character_name,
-	items.name AS item,
+	items.name AS item_name,
 	items.armor,
 	items.damage
 FROM characters
@@ -207,8 +208,9 @@ FROM characters
 		ON inventory.item_id = items.item_id
 UNION
 SELECT 
+	characters.character_id,
 	characters.name AS character_name,
-	items.name AS item,
+	items.name AS item_name,
 	items.armor,
 	items.damage
 FROM characters
