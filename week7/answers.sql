@@ -217,15 +217,15 @@ FROM characters
 	INNER JOIN equipped
 		ON characters.character_id = equipped.character_id
 	INNER JOIN items
-		ON equipped.item_id = items.item_id;
-
+		ON equipped.item_id = items.item_id
+ORDER BY item_name;
 
 
 CREATE OR REPLACE VIEW team_items AS
 SELECT 
 	teams.team_id,
 	teams.name AS team_name,
-	items.name AS item,
+	items.name AS item_name,
 	items.armor,
 	items.damage
 FROM teams
@@ -237,11 +237,11 @@ FROM teams
 		ON characters.character_id = inventory.character_id
 	INNER JOIN items
 		ON inventory.item_id = items.item_id
-UNION
+    UNION
 SELECT 
 	teams.team_id,
 	teams.name AS team_name,
-	items.name AS item,
+	items.name AS item_name,
 	items.armor,
 	items.damage
 FROM teams
@@ -252,4 +252,5 @@ FROM teams
 	INNER JOIN equipped
 		ON characters.character_id = equipped.character_id
 	INNER JOIN items
-		ON equipped.item_id = items.item_id;
+		ON equipped.item_id = items.item_id
+ORDER BY item_name;
