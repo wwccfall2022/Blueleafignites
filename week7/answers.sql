@@ -123,8 +123,7 @@ BEGIN
 		inventory.character_id,
 		inventory.item_id
 	FROM inventory
-	WHERE inventory.inventory_id = find_item_by_id
-	ORDER BY item_name;
+	WHERE inventory.inventory_id = find_item_by_id;
     
 	DELETE FROM inventory WHERE inventory.inventory_id = find_item_by_id; 
 END;;
