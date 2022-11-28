@@ -122,35 +122,33 @@ BEGIN
 		inventory.inventory_id,
 		inventory.character_id,
 		inventory.item_id
-	FROM inventory
-	WHERE inventory.inventory_id = find_item_by_id;
-    
+	FROM inventory;
+
 	DELETE FROM inventory WHERE inventory.inventory_id = find_item_by_id; 
 END;;
 
 CREATE PROCEDURE unequip(equipped_id INT UNSIGNED)
 BEGIN
 	DECLARE find_item_by_id INT UNSIGNED;
-    	SELECT equipped_id INTO find_item_by_id;
-    
+	SELECT equipped_id INTO find_item_by_id;
+
 	INSERT INTO inventory
 	SELECT 
 		equipped.equipped_id,
 		equipped.character_id,
 		equipped.item_id
-	FROM equipped
-	WHERE equipped.equipped_id = find_item_by_id;
-    
-	DELETE FROM equipped WHERE equipped.equipped_id = find_item_by_id; 
+	FROM equipped;
+
+	DELETE FROM equipped WHERE equipped.equipped_id = find_item_by_id;
 END;;
 
 CREATE PROCEDURE set_winners(team_id INT UNSIGNED)
 BEGIN
-	DECLARE find_winners_by_team_id INT UNSIGNED;
-    	SELECT team_id INTO find_winners_by_team_id;
-    
-    	DELETE FROM winners;
-    
+	DECLARE find_winner_by_team_id INT UNSIGNED;
+	SELECT team_id INTO find_winner_by_team_id;
+
+	DELETE FROM winners;
+
 	INSERT INTO winners
 	SELECT 
 		characters.character_id,
@@ -159,8 +157,7 @@ BEGIN
 		INNER JOIN team_members
 			ON teams.team_id = team_members.team_id
 		INNER JOIN characters
-			ON team_members.character_id = characters.character_id
-	WHERE teams.team_id = find_winners_by_team_id;
+			ON team_members.character_id = characters.character_id;
 END;;
 
 CREATE FUNCTION armor_total(character_id INT UNSIGNED)
@@ -168,26 +165,25 @@ RETURNS TINYINT
 DETERMINISTIC 
 BEGIN
 	DECLARE find_armor_total_by_character_id INT UNSIGNED;
-	DECLARE sum_of_character_armor_from_items TINYINT;
-	DECLARE sum_of_character_natural_armor TINYINT;
-	DECLARE total_sum_of_armor TINYINT;
-    
+	DECLARE armor_from_items TINYINT;
+	DECLARE natural_armor TINYINT;
+
 	SELECT character_id INTO find_armor_total_by_character_id;
-    
+
 	SELECT 
 		SUM(items.armor)
 	FROM equipped
 		INNER JOIN items
 			ON equipped.item_id = items.item_id
 	WHERE equipped.character_id = find_armor_total_by_character_id
-    	INTO sum_of_character_armor_from_items;
-    
+	INTO armor_from_items;
+
 	SELECT character_stats.armor 
 	FROM character_stats 
 	WHERE character_stats.character_id = find_armor_total_by_character_id
-	INTO sum_of_character_natural_armor;
+	INTO natural_armor;
 
-	SELECT sum_of_character_armor_from_items + sum_of_character_natural_armor INTO total_sum_of_armor;
+	Return armor_from_items + natural_armor;
 
 Return total_sum_of_armor;
 END;;
