@@ -259,7 +259,7 @@ FROM characters
 		ON characters.character_id = equipped.character_id
 	INNER JOIN items
 		ON equipped.item_id = items.item_id
-ORDER BY item_name;
+ORDER BY item_name ASC;
 
 
 CREATE OR REPLACE VIEW team_items AS
