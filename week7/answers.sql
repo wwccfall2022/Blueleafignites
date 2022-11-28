@@ -142,7 +142,7 @@ BEGIN
 	FROM equipped
 	WHERE equipped.equipped_id = find_item_by_id;
 
-	DELETE FROM eqequipped WHERE equipped.equipped_id = find_item_by_id;
+	DELETE FROM equipped WHERE equipped.equipped_id = find_item_by_id;
 END;;
 
 CREATE PROCEDURE set_winners(team_id INT UNSIGNED)
