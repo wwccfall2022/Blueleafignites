@@ -192,6 +192,47 @@ BEGIN
 Return total_sum_of_armor;
 END;;
 
+CREATE PROCEDURE attack(id_of_character_being_attacked INT UNSIGNED, id_of_equipped_item_used_for_attack INT UNSIGNED)
+BEGIN
+	DECLARE find_dmg_by_item_id INT UNSIGNED;	
+	DECLARE character_being_attacked INT UNSIGNED;
+    
+	DECLARE weapon_dmg TINYINT;
+	DECLARE dmg_dealt TINYINT;
+	DECLARE character_armor TINYINT;
+	DECLARE character_hp TINYINT;
+
+	SELECT id_of_equipped_item_used_for_attack INTO find_dmg_by_item_id;
+	SELECT id_of_character_being_attacked INTO character_being_attacked;
+    
+	SELECT armor_total(character_being_attacked) INTO character_armor;
+
+	SELECT
+		items.damage
+	FROM items
+		INNER JOIN equipped 
+		ON items.item_id = equipped.item_id
+	WHERE equipped.equipped_id = find_dmg_by_item_id
+	INTO weapon_dmg;
+
+	SELECT 
+		character_stats.health 
+	FROM character_stats 
+	WHERE character_id = character_being_attacked
+	INTO character_hp;
+
+	SET dmg_dealt = weapon_dmg - character_armor;
+
+	SET character_hp = character_hp - dmg_dealt;
+
+	IF weapon_dmg > character_armor THEN
+	    UPDATE character_stats SET health = character_hp WHERE character_id = character_being_attacked;
+
+		IF character_hp <= 0 THEN
+			DELETE FROM characters WHERE character_id = character_being_attacked;
+		END IF;
+   END IF;
+END;;
 DELIMITER ;
 
 CREATE OR REPLACE VIEW character_items AS
