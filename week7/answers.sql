@@ -122,7 +122,9 @@ BEGIN
 		inventory.inventory_id,
 		inventory.character_id,
 		inventory.item_id
-	FROM inventory;
+	FROM inventory
+	WHERE inventory.inventory_id = find_item_by_id
+	ORDER BY item_name ASC;
 
 	DELETE FROM inventory WHERE inventory.inventory_id = find_item_by_id; 
 END;;
@@ -137,9 +139,10 @@ BEGIN
 		equipped.equipped_id,
 		equipped.character_id,
 		equipped.item_id
-	FROM equipped;
+	FROM equipped
+	WHERE equipped.equipped_id = find_item_by_id;
 
-	DELETE FROM equipped WHERE equipped.equipped_id = find_item_by_id;
+	DELETE FROM eqequipped WHERE equipped.equipped_id = find_item_by_id;
 END;;
 
 CREATE PROCEDURE set_winners(team_id INT UNSIGNED)
