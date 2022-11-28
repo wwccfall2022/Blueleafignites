@@ -157,7 +157,8 @@ BEGIN
 		INNER JOIN team_members
 			ON teams.team_id = team_members.team_id
 		INNER JOIN characters
-			ON team_members.character_id = characters.character_id;
+			ON team_members.character_id = characters.character_id
+	WHERE teams.team_id = find_winner_by_team_id;
 END;;
 
 CREATE FUNCTION armor_total(character_id INT UNSIGNED)
