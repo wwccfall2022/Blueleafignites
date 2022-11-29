@@ -7,15 +7,15 @@ CREATE TABLE users (
 	first_name VARCHAR(30) NOT NULL,
 	last_name VARCHAR(30) NOT NULL,
 	email VARCHAR(50) NOT NULL,
-	created_on DATETIME NOT NULL DEFAULT NOW()
+	created_on TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE sessions (
 	session_id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
 	user_id INT UNSIGNED,
-	created_on DATETIME NOT NULL DEFAULT NOW(),
-	UPDATED_ON TIMESTAMP NOT NULL DEFAULT NOW() ON UPDATE NOW(),
-    
+	created_on TIMESTAMP NOT NULL DEFAULT NOW(),
+	updated_on TIMESTAMP NOT NULL DEFAULT NOW() ON UPDATE NOW(),
+
 	CONSTRAINT sessions_fk_users
 		FOREIGN KEY (user_id)
 		REFERENCES users (user_id)
@@ -32,14 +32,20 @@ CREATE TABLE friends (
 		FOREIGN KEY (user_id)
 		REFERENCES users (user_id)
 		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+
+	CONSTRAINT friends_fk_users_friend
+		FOREIGN KEY (friend_id)
+		REFERENCES users (user_id)
+		ON UPDATE CASCADE
 		ON DELETE CASCADE
 );
 
 CREATE TABLE posts (
 	post_id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
 	user_id INT UNSIGNED,
-	created_on DATETIME NOT NULL DEFAULT NOW(),	
-    UPDATED_ON TIMESTAMP NOT NULL DEFAULT NOW() ON UPDATE NOW(),
+	created_on TIMESTAMP NOT NULL DEFAULT NOW(),	
+	updated_on TIMESTAMP NOT NULL DEFAULT NOW() ON UPDATE NOW(),
 	content VARCHAR(128) NOT NULL,
 
 	CONSTRAINT posts_fk_users
@@ -59,7 +65,7 @@ CREATE TABLE notifications (
 		REFERENCES users (user_id)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE,
-        
+
 	CONSTRAINT notifications_fk_posts
 		FOREIGN KEY (post_id)
 		REFERENCES posts (post_id)
@@ -67,3 +73,15 @@ CREATE TABLE notifications (
 		ON DELETE CASCADE
 );
   
+CREATE OR REPLACE VIEW notification_posts AS 
+SELECT 
+	notifications.user_id,
+	users.first_name,
+	users.last_name,
+	posts.post_id,
+	posts.content
+FROM notifications
+	INNER JOIN posts
+		ON notifications.post_id = posts.post_id
+	LEFT OUTER JOIN users
+		ON posts.user_id = users.user_id;
