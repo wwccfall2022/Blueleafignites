@@ -115,31 +115,50 @@ DELIMITER ;;
 CREATE PROCEDURE equip(inventory_id INT UNSIGNED)
 BEGIN
 	DECLARE find_item_by_id INT UNSIGNED;
+	DECLARE id_of_character INT UNSIGNED;
+	DECLARE id_of_item INT UNSIGNED;
+
 	SELECT inventory_id INTO find_item_by_id;
-	INSERT INTO equipped
+
 	SELECT 
-		inventory.inventory_id,
-		inventory.character_id,
+		inventory.character_id
+	FROM inventory
+	WHERE inventory.inventory_id = find_item_by_id
+	INTO id_of_character;
+
+	SELECT 
 		inventory.item_id
 	FROM inventory
-	WHERE inventory.inventory_id = find_item_by_id;
-    
+	WHERE inventory.inventory_id = find_item_by_id
+	INTO id_of_item;
+
+	INSERT INTO equipped (character_id, item_id) VALUES (id_of_character, id_of_item);
+
 	DELETE FROM inventory WHERE inventory.inventory_id = find_item_by_id; 
 END;;
 
 CREATE PROCEDURE unequip(equipped_id INT UNSIGNED)
 BEGIN
 	DECLARE find_item_by_id INT UNSIGNED;
-    	SELECT equipped_id INTO find_item_by_id;
-    
-	INSERT INTO inventory
+	DECLARE id_of_character INT UNSIGNED;
+	DECLARE id_of_item INT UNSIGNED;
+
+	SELECT equipped_id INTO find_item_by_id;
+
 	SELECT 
-		equipped.equipped_id,
-		equipped.character_id,
+		equipped.character_id
+	FROM equipped
+	WHERE equipped.equipped_id = find_item_by_id
+	INTO id_of_character;
+
+	SELECT 
 		equipped.item_id
 	FROM equipped
-	WHERE equipped.equipped_id = find_item_by_id;
-    
+	WHERE equipped.equipped_id = find_item_by_id
+	INTO id_of_item;
+
+	INSERT INTO inventory (character_id, item_id) VALUES (id_of_character, id_of_item);
+
 	DELETE FROM equipped WHERE equipped.equipped_id = find_item_by_id; 
 END;;
 
