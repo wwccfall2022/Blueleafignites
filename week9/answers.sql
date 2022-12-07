@@ -12,7 +12,7 @@ CREATE TABLE users (
 
 CREATE TABLE sessions (
 	session_id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
-	user_id INT UNSIGNED,
+	user_id INT UNSIGNED NOT NULL,
 	created_on TIMESTAMP NOT NULL DEFAULT NOW(),
 	updated_on TIMESTAMP NOT NULL DEFAULT NOW() ON UPDATE NOW(),
 
@@ -25,8 +25,8 @@ CREATE TABLE sessions (
 
 CREATE TABLE friends (
 	user_friend_id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
-	user_id INT UNSIGNED,
-	friend_id INT UNSIGNED,
+	user_id INT UNSIGNED NOT NULL,
+	friend_id INT UNSIGNED NOT NULL,
 
 	CONSTRAINT friends_fk_users
 		FOREIGN KEY (user_id)
@@ -43,7 +43,7 @@ CREATE TABLE friends (
 
 CREATE TABLE posts (
 	post_id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
-	user_id INT UNSIGNED,
+	user_id INT UNSIGNED NOT NULL,
 	created_on TIMESTAMP NOT NULL DEFAULT NOW(),	
 	updated_on TIMESTAMP NOT NULL DEFAULT NOW() ON UPDATE NOW(),
 	content VARCHAR(128) NOT NULL,
@@ -57,8 +57,8 @@ CREATE TABLE posts (
 
 CREATE TABLE notifications (
 	notification_id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
-	user_id INT UNSIGNED,
-	post_id INT UNSIGNED,
+	user_id INT UNSIGNED NOT NULL,
+	post_id INT UNSIGNED NOT NULL,
 
 	CONSTRAINT notifications_fk_users
 		FOREIGN KEY (user_id)
@@ -72,7 +72,18 @@ CREATE TABLE notifications (
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
 );
-  
+
+
+DELIMITER ;;
+CREATE EVENT expired_session
+	ON SCHEDULE EVERY 10 SECOND
+DO
+BEGIN
+	DELETE FROM sessions WHERE updated_on < DATE_SUB(NOW(), INTERVAL 2 HOUR);
+END;;
+DELIMITER ;
+
+
 CREATE OR REPLACE VIEW notification_posts AS 
 SELECT 
 	notifications.user_id,
@@ -80,8 +91,8 @@ SELECT
 	users.last_name,
 	posts.post_id,
 	posts.content
-FROM notifications
-	INNER JOIN posts
-		ON notifications.post_id = posts.post_id
-	LEFT OUTER JOIN users
-		ON posts.user_id = users.user_id;
+FROM users
+	LEFT OUTER JOIN posts
+		ON users.user_id = posts.user_id
+	LEFT OUTER JOIN notifications
+		ON posts.post_id = notifications.post_id;
