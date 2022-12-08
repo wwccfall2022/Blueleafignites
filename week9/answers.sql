@@ -75,6 +75,39 @@ CREATE TABLE notifications (
 
 
 DELIMITER ;;
+CREATE PROCEDURE add_post(id_of_user INT UNSIGNED, content_of_post VARCHAR(128))
+BEGIN
+	DECLARE id_of_friend INT UNSIGNED;
+	DECLARE id_of_post INT UNSIGNED;
+	DECLARE row_not_found INT DEFAULT FALSE;
+
+	DECLARE user_friends_cursor CURSOR FOR
+	SELECT 
+		friends.friend_id
+	FROM friends
+	WHERE friends.user_id = id_of_user;
+
+	DECLARE CONTINUE HANDLER FOR NOT FOUND
+	SET row_not_found = TRUE;
+
+	INSERT INTO posts (user_id, content) VALUES (id_of_user, content_of_post);
+
+	SELECT LAST_INSERT_ID() INTO id_of_post;
+
+	OPEN user_friends_cursor;
+	friend_loop : LOOP
+
+		FETCH user_friends_cursor INTO id_of_friend;
+		IF row_not_found THEN
+			LEAVE friend_loop;
+		END IF;
+
+		INSERT INTO notifications (user_id, post_id) VALUES (id_of_friend, id_of_post);
+
+	END LOOP;
+	CLOSE user_friends_cursor;
+END;;
+
 CREATE EVENT expired_session
 	ON SCHEDULE EVERY 10 SECOND
 DO
