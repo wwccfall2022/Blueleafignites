@@ -75,6 +75,44 @@ CREATE TABLE notifications (
 
 
 DELIMITER ;;
+CREATE TRIGGER new_user
+	AFTER INSERT ON users
+	FOR EACH ROW
+BEGIN
+	DECLARE new_user_id INT UNSIGNED;
+	DECLARE id_of_post INT UNSIGNED;
+	DECLARE row_not_found INT DEFAULT FALSE;
+
+	DECLARE user_cursor CURSOR FOR 
+	SELECT 
+		users.user_id 
+	FROM users 
+	WHERE user_id != NEW.user_id;
+
+	DECLARE CONTINUE HANDLER FOR NOT FOUND
+	SET row_not_found = TRUE;
+
+	INSERT INTO posts
+		(user_id, content)
+	VALUES
+		(NEW.user_id, CONCAT(NEW.first_name, " ", NEW.last_name, " just joined!"));
+
+	SELECT LAST_INSERT_ID() INTO id_of_post;
+
+	OPEN user_cursor;
+	user_loop : LOOP
+
+		FETCH user_cursor INTO new_user_id;
+		IF row_not_found THEN
+			LEAVE user_loop;
+		END IF;
+
+		INSERT INTO notifications (user_id, post_id) VALUES (new_user_id, id_of_post);
+
+	END LOOP user_loop;
+	CLOSE user_cursor;
+END;;
+
 CREATE PROCEDURE add_post(id_of_user INT UNSIGNED, content_of_post VARCHAR(128))
 BEGIN
 	DECLARE id_of_friend INT UNSIGNED;
